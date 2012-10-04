@@ -17,6 +17,7 @@ module Autotest
     def find_email_by_subject(option={})
       init()
       body = nil
+      time = 0
       while body == nil or time < 15 do
 	time += 1
 
