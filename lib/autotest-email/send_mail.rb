@@ -1,12 +1,13 @@
-require 'rubygems'
+require 'autotest-email'
 require 'rmail'
 require 'net/smtp'
-require 'autotest-email'
+require 'tlsmail'
 
 module SendMail
   # Default settings. You may change all of them on each call of send_mail method.
   @defaults = {
     :smtp => {
+      :enable_starttls_auto => true,
       :address => 'smtp.gmail.com',
       :port => 587,
       :domain => 'gmail.com', # This field sends on HELO request
@@ -118,6 +119,7 @@ module SendMail
     email.header['Message-Id'] = "#{Time.now.to_s}@#{domain}"
     email.header.date = Time.now
 
+    Net::SMTP.enable_tls(OpenSSL::SSL::VERIFY_NONE) 
     Net::SMTP.start(server, port, domain, login, password, authentication) do |smtp|
       smtp.send_mail RMail::Serialize.write('', email), from_email, email.header.to.addresses
     end

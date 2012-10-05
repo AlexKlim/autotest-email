@@ -15,5 +15,6 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = Autotest::Email::VERSION
 
-  gem.add_dependency 'mail'
+  gem.add_dependency 'rmail'
+  gem.add_dependency 'tlsmail'
 end

@@ -1,5 +1,4 @@
 require 'autotest-email/version'
-require 'autotest-email/send_mail'
 require 'rmail'
 require 'net/imap'
 require 'net/smtp'
@@ -94,6 +93,9 @@ module Autotest
     end
 
   end
+
+  autoload :SendMail,  'autotest-email/send_mail'
+
 end
 
 Autotest::Email.configure do |config|
