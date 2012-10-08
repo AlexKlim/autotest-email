@@ -1,7 +1,6 @@
 require 'autotest-email'
 require 'rmail'
 require 'net/smtp'
-require 'tlsmail'
 
 module SendMail
   # Default settings. You may change all of them on each call of send_mail method.
