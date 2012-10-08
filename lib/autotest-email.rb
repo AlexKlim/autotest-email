@@ -99,6 +99,7 @@ module Autotest
 end
 
 Autotest::Email.configure do |config|
+  #for get email
   config.address    = 'pop.gmail.com'
   config.port	    = 995
   config.user_name  = 'example@gmail.com'
