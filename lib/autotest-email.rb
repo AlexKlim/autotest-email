@@ -39,7 +39,8 @@ module Autotest
       
       msg = imap.fetch(res, '(UID RFC822.SIZE ENVELOPE BODY[TEXT])')[0]
       body = msg.attr['BODY[TEXT]']
-      
+      imap.store(res, '+FLAGS', [:Deleted])
+
       disconnect(imap)
 
       return body
@@ -87,7 +88,6 @@ module Autotest
     end
 
     def disconnect(imap)
-      imap.store(res, '+FLAGS', [:Deleted])
       imap.expunge
       imap.disconnect
     end
