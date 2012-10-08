@@ -44,13 +44,13 @@ We have find_email_by_subject, clear_email_by_subject, send_exception_email
 
 The method will return body from email.
 
-### User clear_email_by_subject method
+### Use clear_email_by_subject method
 
     clear_email_by_subject('<subject>')
 
 Just remove all emails with the subject
 
-### User send_exception_email method
+### Use send_exception_email method
 
     send_exception_email(
       to: <email_or_emailList>, 
