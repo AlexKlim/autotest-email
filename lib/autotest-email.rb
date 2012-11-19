@@ -26,12 +26,13 @@ module Autotest
 
         imap = connect
         imap.search(['SUBJECT', option[:subject]]).each do |message_id|
+
           envelope = imap.fetch(message_id, 'ENVELOPE')[0].attr['ENVELOPE']
-          p envelope
           if "#{envelope.to[0].mailbox}@#{envelope.to[0].host}" == option[:to]
             res = message_id
             break
           end
+
         end
 
         if res.nil?
