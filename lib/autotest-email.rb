@@ -22,19 +22,21 @@ module Autotest
       time = 0
 
       while res == nil and time < 15 do
-	time += 1
+        time += 1
 
-	imap = connect 
-	imap.search(['SUBJECT', option[:subject]]).each do |message_id|
-	  envelope = imap.fetch(message_id, 'ENVELOPE')[0].attr['ENVELOPE']  
-	  if "#{envelope.to[0].mailbox}@#{envelope.to[0].host}" == option[:to]
-	    res = message_id
-	  else
-	    res = nil
+        imap = connect
+        imap.search(['SUBJECT', option[:subject]]).each do |message_id|
+          envelope = imap.fetch(message_id, 'ENVELOPE')[0].attr['ENVELOPE']
+          p envelope
+          if "#{envelope.to[0].mailbox}@#{envelope.to[0].host}" == option[:to]
+            res = message_id
+            break
           end
-	end
-	imap.disconnect if res == nil
-	sleep 15
+        end
+        if res == nil
+          imap.disconnect
+          sleep 15
+        end
       end
       
       msg = imap.fetch(res, '(UID RFC822.SIZE ENVELOPE BODY[TEXT])')[0]
