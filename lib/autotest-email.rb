@@ -33,10 +33,12 @@ module Autotest
             break
           end
         end
-        if res == nil
+
+        if res.nil?
           imap.disconnect
           sleep 15
         end
+
       end
       
       msg = imap.fetch(res, '(UID RFC822.SIZE ENVELOPE BODY[TEXT])')[0]
