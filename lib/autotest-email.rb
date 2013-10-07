@@ -25,7 +25,7 @@ module Autotest
         time += 1
 
         imap = connect 
-        imap.search(['SUBJECT', option[:subject]]).each do |message_id|
+        imap.search(['SUBJECT', option[:subject]]).last(20).each do |message_id|
           envelope = imap.fetch(message_id, 'ENVELOPE')[0].attr['ENVELOPE']  
           if "#{envelope.to[0].mailbox}@#{envelope.to[0].host}" == option[:to]
             res = message_id
