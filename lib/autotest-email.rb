@@ -11,7 +11,7 @@ module Autotest
 
       attr_accessor :address, :port, :user_name, :password, :enable_ssl
       attr_accessor :from, :to, :subject, :body, :file_name, :file_path, :reply_to
-    
+
       def configure
         yield self
       end
@@ -24,22 +24,23 @@ module Autotest
       while res == nil and time < 15 do
         time += 1
 
-        imap = connect 
-        imap.search(['SUBJECT', option[:subject]]).last(20).each do |message_id|
-          envelope = imap.fetch(message_id, 'ENVELOPE')[0].attr['ENVELOPE']  
-          if "#{envelope.to[0].mailbox}@#{envelope.to[0].host}" == option[:to]
-            res = message_id
+        imap = connect
+        imap.uid_search(['SUBJECT', option[:subject]]).last(20).each do |message_uid|
+          envelope = imap.uid_fetch(message_uid, 'ENVELOPE')[0].attr['ENVELOPE']
+          res = if "#{envelope.to[0].mailbox}@#{envelope.to[0].host}" == option[:to]
+            message_uid
           else
-            res = nil
+            nil
           end
         end
-        imap.disconnect if res == nil
+        imap.disconnect if res.nil?
         sleep 15
       end
-      
-      msg = imap.fetch(res, '(UID RFC822.SIZE ENVELOPE BODY[TEXT])')[0]
+
+      msg = imap.uid_fetch(res, '(UID RFC822.SIZE ENVELOPE BODY[TEXT])')[0]
       body = msg.attr['BODY[TEXT]']
-      imap.store(res, '+FLAGS', [:Deleted])
+
+      delete_email(imap, res)
 
       disconnect(imap)
 
@@ -48,9 +49,9 @@ module Autotest
 
     def clear_email_by_subject(subject)
       imap = connect
-      imap.search(['SUBJECT', subject]).each do |msg|
-        imap.store(msg, '+FLAGS', [:Deleted])
-      end 
+      imap.uid_search(['SUBJECT', subject]).each do |message_uid|
+        delete_email(imap, message_uid)
+      end
       disconnect(imap)
     end
 
@@ -67,7 +68,7 @@ module Autotest
           :attachments_transfer_encoding => :quoted_printable
         },
         :attachments => [
-          { 
+          {
             :filename => options[:file_name].nil? ? Email.file_name : options[:file_name],
             :mime_type => 'image/png',
             :content => File.open(file_path) {|file| file.sysread(File.size(file))},
@@ -75,16 +76,20 @@ module Autotest
           }
         ]
       )
-  
     end
 
-    private 
-    
+    private
+
+    def delete_email(imap, message_uid)
+      imap.uid_store(message_uid, "+FLAGS", [:Deleted])
+      imap.uid_copy(message_uid, "[Gmail]/Trash")
+    end
+
     def connect
-      imap = Net::IMAP.new(Email.address, Email.port, Email.enable_ssl)
-      imap.login(Email.user_name, Email.password)
-      imap.select('INBOX')
-      imap
+      Net::IMAP.new(Email.address, Email.port, Email.enable_ssl).tap do |imap|
+        imap.login(Email.user_name, Email.password)
+        imap.select('[Gmail]/All Mail')
+      end
     end
 
     def disconnect(imap)
